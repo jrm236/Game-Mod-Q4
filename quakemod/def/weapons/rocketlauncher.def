@@ -77,7 +77,7 @@ entityDef weapon_rocketlauncher
 
 	"fireRate"					".1"
 	"reloadRate"				".1"
-	"spread"					"10"
+	"spread"					"25"
 
 	"ammoRegenStep"				"1"
 	"ammoRegenTime"				"1750"
@@ -330,16 +330,19 @@ entityDef projectile_rocket
 	"def_damage"				"damage_rocketDirect"
 	"def_splash_damage"			"damage_rocketSplash"
 																											
-	"speed"						"150"
-	"fuse"						"6"
+	"speed"						"350"
+	"fuse"						"8"
 	"push"						"48000"
-	
+	"gravity"					"1.2"
+
+	"bounce"					"1"
+	"bounce_count"				"3"
 							
 	"detonate_on_fuse"			"1"
 	"detonate_on_death"			"0"
-	"detonate_on_world"			"1"
+	"detonate_on_world"			"0"
 	"detonate_on_actor"			"1"
-	"detonate_on_bounce"		"1"
+	"detonate_on_bounce"		"0"
 								
 	"impact_gib"				"1"								
 	"decal_size"				"75"
