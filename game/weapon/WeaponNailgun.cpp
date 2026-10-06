@@ -83,6 +83,8 @@ private:
 	stateResult_t		Frame_ClaspClose		( const stateParms_t& parms );	
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponNailgun );
+
+	int									burstCount;
 };
 
 CLASS_DECLARATION( rvWeapon, rvWeaponNailgun )
@@ -134,6 +136,8 @@ void rvWeaponNailgun::Spawn ( void ) {
 	
 	ExecuteState ( "ClaspClose" );	
 	SetState ( "Raise", 0 );	
+
+	burstCount = 0;
 }
 
 /*
@@ -160,6 +164,9 @@ void rvWeaponNailgun::Save ( idSaveGame *savefile ) const {
 	savefile->WriteInt ( drumSpeed );
 	savefile->WriteInt ( drumSpeedIdeal );
 	savefile->WriteFloat ( drumMultiplier );
+
+	// added burstcount save
+	savefile->WriteInt ( burstCount );
 }
 
 /*
@@ -187,6 +194,9 @@ void rvWeaponNailgun::Restore ( idRestoreGame *savefile ) {
 	savefile->ReadInt ( drumSpeed );
 	savefile->ReadInt ( drumSpeedIdeal );
 	savefile->ReadFloat ( drumMultiplier );
+
+	// added burstcount restore
+	savefile->ReadInt ( burstCount ); 
 }
 
 /*
@@ -602,14 +612,18 @@ stateResult_t rvWeaponNailgun::State_Idle( const stateParms_t& parms ) {
 				SetState ( "Lower", 4 );
 				return SRESULT_DONE;
 			}
+
+			if (!wsfl.attack && burstCount >= 3) {
+				burstCount = 0;
+			}
 		
 			if ( !clipSize ) {
-				if ( gameLocal.time > nextAttackTime && wsfl.attack && AmmoAvailable ( ) ) {
+				if ( gameLocal.time > nextAttackTime && wsfl.attack && burstCount == 0 && AmmoAvailable ( ) ) {
 					SetState ( "Fire", 0 );
 					return SRESULT_DONE;
 				}
 			} else {
-				if ( gameLocal.time > nextAttackTime && wsfl.attack && AmmoInClip ( ) ) {
+				if ( gameLocal.time > nextAttackTime && wsfl.attack && burstCount == 0 && AmmoInClip ( ) ) {
 					SetState ( "Fire", 0 );
 					return SRESULT_DONE;
 				}  
@@ -652,12 +666,15 @@ stateResult_t rvWeaponNailgun::State_Fire( const stateParms_t& parms ) {
 				PostState ( "Fire", 2 );
 				return SRESULT_DONE;
 			}
+
+			burstCount = 0;
+
 			nextAttackTime = gameLocal.time;
 			
 			return SRESULT_STAGE ( STAGE_FIRE );
 			
 		case STAGE_FIRE:
-			if ( !wsfl.attack || wsfl.reload || wsfl.lowerWeapon || AmmoInClip ( ) <= 0 ) {
+			if ( wsfl.reload || wsfl.lowerWeapon || AmmoInClip ( ) <= 0 ) {
 				return SRESULT_STAGE ( STAGE_DONE );
 			}
 			if ( mods & NAILGUN_MOD_ROF_AMMO ) {
@@ -673,6 +690,8 @@ stateResult_t rvWeaponNailgun::State_Fire( const stateParms_t& parms ) {
 				Attack ( false, 1, spread, 0.0f, 1.0f );
 				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
 			}
+
+			burstCount++;
 			
 			// Play the exhaust effects
 			viewModel->PlayEffect ( "fx_exhaust", jointSteamRightView, false );
@@ -684,11 +703,14 @@ stateResult_t rvWeaponNailgun::State_Fire( const stateParms_t& parms ) {
 			return SRESULT_STAGE ( STAGE_FIREWAIT );
 
 		case STAGE_FIREWAIT:
-			if ( !wsfl.attack || wsfl.reload || wsfl.lowerWeapon || AmmoInClip ( ) <= 0 ) {
+			if ( wsfl.reload || wsfl.lowerWeapon || AmmoInClip ( ) <= 0 ) {
 				return SRESULT_STAGE ( STAGE_DONE );
 			}
 			if ( gameLocal.time >= nextAttackTime ) {
-				return SRESULT_STAGE ( STAGE_FIRE );
+				if (burstCount < 3) {
+					return SRESULT_STAGE(STAGE_FIRE);
+				}
+				return SRESULT_STAGE(STAGE_DONE);
 			}
 			return SRESULT_WAIT;
 			
