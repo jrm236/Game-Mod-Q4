@@ -3,6 +3,7 @@
 
 #include "../Game_local.h"
 #include "../Weapon.h"
+#include "../Projectile.h"
 
 #define BLASTER_SPARM_CHARGEGLOW		6
 
@@ -42,6 +43,9 @@ private:
 	stateResult_t		State_Flashlight		( const stateParms_t& parms );
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponBlaster );
+
+	virtual void		OnLaunchProjectile		( idProjectile* proj );
+	idEntity*			FindMissileTarget		( void ); 
 };
 
 CLASS_DECLARATION( rvWeapon, rvWeaponBlaster )
@@ -207,6 +211,75 @@ rvWeaponBlaster::PostSave
 ================
 */
 void rvWeaponBlaster::PostSave ( void ) {
+}
+
+/*
+================
+rvWeaponBlaster::OnLaunchProjectile
+================
+*/
+void rvWeaponBlaster::OnLaunchProjectile(idProjectile* proj) {
+	rvWeapon::OnLaunchProjectile(proj);
+
+	idGuidedProjectile* guided;
+	guided = dynamic_cast<idGuidedProjectile*>(proj);
+
+	idEntity* target = FindMissileTarget();
+
+	if ( !guided ) {
+		return;
+	}
+
+	if (target) {
+		guided->GuideTo( target );
+	}
+}
+
+/*
+================
+rvWeaponBlaster::Homing
+================
+*/
+idEntity* rvWeaponBlaster::FindMissileTarget(void) {
+	const float targetRadius = 1500.0f;
+	idEntity* chosenTarget = NULL;
+	float bestDistance = targetRadius;
+
+	for (int i = 0; i < gameLocal.num_entities; i++) {
+
+		idEntity* ent = gameLocal.entities[i];
+
+		if (!ent) {
+			continue;
+		}
+
+		if (!ent->IsType(idActor::GetClassType())) {
+			continue;
+		}
+
+		idActor* actor = static_cast<idActor*>(ent);
+
+		if (actor == owner) {
+			continue;
+		}
+
+		if (actor->health <= 0) {
+			continue;
+		}
+
+		if (actor->team == owner->team) {
+			continue;
+		}
+
+		float distance = (actor->GetPhysics()->GetOrigin() - playerViewOrigin).Length();
+
+		if (distance < bestDistance) {
+			bestDistance = distance;
+			chosenTarget = actor;
+		}
+	}
+
+	return chosenTarget;
 }
 
 /*
@@ -427,11 +500,26 @@ stateResult_t rvWeaponBlaster::State_Fire ( const stateParms_t& parms ) {
 
 	
 			if ( gameLocal.time - fireHeldTime > chargeTime ) {	
-				Attack ( true, 1, spread, 0, 1.0f );
+
+				int extraMissiles = 0;
+
+				if ( gameLocal.time - fireHeldTime > chargeTime + 500 ) {
+					extraMissiles = 1;
+				}
+				if ( gameLocal.time - fireHeldTime > chargeTime + 1000 ) {
+					extraMissiles = 2;
+				}
+				if ( gameLocal.time - fireHeldTime > chargeTime + 1500 ) {
+					extraMissiles = 4;
+				}
+				if (gameLocal.time - fireHeldTime > chargeTime + 3000) {
+					extraMissiles = 9;
+				}
+				Attack ( true, 1 + extraMissiles, spread, 0, 1.0f );
 				PlayEffect ( "fx_chargedflash", barrelJointView, false );
 				PlayAnim( ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames );
 			} else {
-				Attack ( false, 15, 7, 0, 0.1f );
+				Attack ( false, 3, spread, 0, 1.0f );
 				PlayEffect ( "fx_normalflash", barrelJointView, false );
 				PlayAnim( ANIMCHANNEL_ALL, "fire", parms.blendFrames );
 			}
