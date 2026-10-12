@@ -2820,7 +2820,17 @@ void rvWeapon::Hitscan( const idDict& dict, const idVec3& muzzleOrigin, const id
 		}
 		dir.Normalize();
 
-		gameLocal.HitScan( dict, muzzleOrigin, dir, fxOrigin, owner, false, 1.0f, NULL, areas );
+		// Modified to capture when a hitscan shot hits
+
+		idEntity* hitEnt = gameLocal.HitScan( dict, muzzleOrigin, dir, fxOrigin, owner, false, 1.0f, NULL, areas );
+
+		if (hitEnt && dict.GetBool("freeze") && hitEnt->IsType(idAI::GetClassType())) {
+			idAI* ai = static_cast<idAI*>(hitEnt);
+
+			int freezeDuration = SEC2MS(dict.GetFloat("freeze_duration", "2.0"));
+
+			ai->ApplyFreeze(freezeDuration);
+		}
 
 		if ( gameLocal.isServer ) {
 			msg.WriteDir( dir, 24 );

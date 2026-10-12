@@ -139,6 +139,8 @@ idAI::idAI ( void ) {
 	actionAnimNum	= 0;
 	actionSkipTime	= 0;
 	actionTime		= 0;
+
+	freezeActive = false;
 }
 
 /*
@@ -351,6 +353,9 @@ void idAI::Save( idSaveGame *savefile ) const {
 	actionMeleeAttack.Save ( savefile );
 	actionLeapAttack.Save ( savefile );
 	actionJumpBack.Save ( savefile );
+
+	// Added Freeze in save
+	savefile->WriteBool( freezeActive );
 }
 
 /*
@@ -560,6 +565,9 @@ void idAI::Restore( idRestoreGame *savefile ) {
 	actionMeleeAttack.Restore ( savefile );
 	actionLeapAttack.Restore ( savefile );
 	actionJumpBack.Restore ( savefile );
+
+	// Added freeze to restore
+	savefile->ReadBool( freezeActive );
 
 	// Set the AAS if the character has the correct gravity vector
 	idVec3 gravity = spawnArgs.GetVector( "gravityDir", "0 0 -1" );
@@ -1140,6 +1148,13 @@ void idAI::Think( void ) {
 	// if we are completely closed off from the player, don't do anything at all
 	if ( CheckDormant() ) {
 		return;
+	}
+
+	// Added to change the color of enemies back to normal.
+	if (freezeActive && gameLocal.time > move.blockTime) {
+
+		freezeActive = false;
+
 	}
 
 	// Simple think this frame?
@@ -5148,4 +5163,16 @@ bool idAI::CheckDeathCausesMissionFailure( void )
 		}
 	}
 	return false;
+}
+
+/*
+===================
+idAI::ApplyFreeze
+===================
+*/
+
+void idAI::ApplyFreeze(int duration) {
+	move.blockTime = gameLocal.time + duration;
+
+	freezeActive = true;
 }

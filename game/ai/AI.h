@@ -478,6 +478,9 @@ public:
  	bool					IsCoverValid					( void ) const;
 	virtual bool			IsCrouching						( void ) const;
 
+	// Added for freeze functionality for Railgun
+	void					ApplyFreeze						( int duration );
+
 
 public:
 
@@ -1232,6 +1235,9 @@ protected:
 	
 	// Head states	
 	stateResult_t			State_Head_Idle						( const stateParms_t& parms );
+
+	// Added for freeze to change color of enemies
+	bool					freezeActive;
 
 	CLASS_STATES_PROTOTYPE ( idAI );
 };
