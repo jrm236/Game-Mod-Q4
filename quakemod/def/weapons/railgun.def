@@ -84,11 +84,11 @@ entityDef weapon_railgun
   	"joint_view_barrel"			"srocket_muzzle_flash"
 	"joint_world_flash"			"muzzle_flash"
 
-	"fireRate"				"1.6"
+	"fireRate"				"0.85"
 	"spread"				"0"
 
 	"inv_weapon"				"weapon_railgun"
-	"inv_start_ammo_railgun"		"10"
+	"inv_start_ammo_railgun"		"20"
 	"inv_item"				"1"
 	"inv_icon"				"gfx/guis/hud/icons/item_railgun"
 	"inv_name"				"#str_107408"
@@ -98,8 +98,8 @@ entityDef weapon_railgun
 
 	"ammoType"				"ammo_railgun"
 	"ammoRequired"				"1"
-	"clipSize"				"3"
-	"lowAmmo"				"1"
+	"clipSize"					"5"
+	"lowAmmo"					"1"
 	"continuousFire"			"1"
 	"dryFireReload" 			"1"
 	"switchWhenEmpty"			"0"
@@ -122,7 +122,7 @@ entityDef weapon_railgun
 	"weapon_scriptobject"		"weapon_railgun"
 
 	"mtr_flashShader"			"lights/muzzleflash"
-	"flashColor"				"0.72 1 .9"
+	"flashColor"				"0.72 0.25 1"
 	"flashRadius"				"260"
 	"flashPointLight"			"1"
 	"flashTime"					"1"
@@ -353,6 +353,10 @@ entityDef hitscan_railgun
 	"push"						"40000"
 	
 	"def_damage"				"damage_railgun"
+
+	"freeze"					"1"
+	"freeze_duration"			"10.0"
+	"freeze_power"				"0.25"
 		
 	"fx_impact"				"effects/weapons/railgun/impact_default.fx"
 	"fx_impact_water"			"effects/ambient/splash_med.fx"
@@ -433,7 +437,7 @@ entityDef hitscan_railgun_penetrate
 
 entityDef damage_railgun 
 {
-	"damage"					"125"
+	"damage"					"15"
 	"push"						"500"
 	"knockback"					"100"
 	"gib"						"1"

@@ -55,6 +55,8 @@ private:
 	int									cylinderMoveTime;
 	int									previousAmmo;
 	bool								zoomed;
+
+	virtual void			OnLaunchProjectile	( idProjectile* proj );
 	
 	CLASS_STATES_PROTOTYPE ( WeaponNapalmGun );
 };
@@ -140,6 +142,30 @@ void WeaponNapalmGun::MuzzleRise( idVec3 &origin, idMat3 &axis ) {
 		return;
 
 	rvWeapon::MuzzleRise( origin, axis );
+}
+
+// Added to make it function like the garlic weapon from V.S
+/*
+===============
+WeaponNapalmGun::OnLaunchProjectile
+===============
+*/
+void WeaponNapalmGun::OnLaunchProjectile( idProjectile* proj ) {
+	rvWeapon::OnLaunchProjectile(proj);
+
+	if (!proj) {
+		return;
+	}
+
+	if (!attackDict.GetBool("player_aura")) {
+		return;
+	}
+
+	proj->GetPhysics()->SetLinearVelocity( vec3_origin );
+	proj->GetPhysics()->SetOrigin( owner->GetPhysics()->GetOrigin() );
+	proj->Bind( owner, true );
+	proj->StartResidualDamage();
+
 }
 
 /*

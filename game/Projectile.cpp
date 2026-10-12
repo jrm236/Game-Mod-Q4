@@ -1514,6 +1514,21 @@ bool idProjectile::GetPhysicsToVisualTransform( idVec3 &origin, idMat3 &axis ) {
 	return true;
 }
 
+//Added for napalm gun
+/*
+================
+idProjectile::StartResidualDamage
+================
+*/
+void idProjectile::StartResidualDamage( void ) {
+	float delay = spawnArgs.GetFloat( "delay_residual" );
+
+	if (delay > 0.0f) {
+		PostEventSec( &EV_ResidualDamage, delay, owner.GetEntity() );
+	}
+}
+
+
 /*
 ===============================================================================
 

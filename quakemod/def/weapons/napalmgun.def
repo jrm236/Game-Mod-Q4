@@ -74,14 +74,14 @@ entityDef weapon_napalmgun
 	"inv_name"					"Napalm Launcher"	
 
 	"fireRate"					".8"
-//	"reloadRate"				".1"
+	"reloadRate"				"1"
 	"spread"					"0"
 	"dirOffset"					"0 0 .1"
 
 	"weaponname"				"Napalm Launcher"
 	"def_projectile"			"projectile_napalm"
 	"ammoType"					"ammo_napalmgun"
-	"clipSize"					"20"
+	"clipSize"					"1"
 	"ammoRequired"				"1"
 	"gui"						"guis/weapons/napalmgun.gui"
 	"mtr_icon"					"gfx/guis/hud/icons/gun_napalmgun"
@@ -269,12 +269,12 @@ entityDef projectile_napalm
 	"contact_friction"			"10"
 	//"bounce"					".65"
 	"gravity"					"1.2"
-	"fuse"						"2.5"
+	"fuse"						"20"
 								
 	"detonate_on_fuse"			"1"
 	"detonate_on_death"			"0"
-	"detonate_on_world"			"1"
-	"detonate_on_actor"			"1"
+	"detonate_on_world"			"0"
+	"detonate_on_actor"			"0"
 								
 	"impact_gib"				"1"
 	"decal_size"				"75"
@@ -298,8 +298,11 @@ entityDef projectile_napalm
 	"fx_impact"					"effects/weapons/napalmgun/impact.fx"
 	"fx_detonate"					"effects/weapons/napalmgun/detonate.fx"
 
-	//"delay_residual"				"1.5"
-	//"residual_time"					"6"
+
+	"player_aura"					"1"
+	"delay_residual"				"0.75"
+	"def_residual_damage"			"damage_napalmGlobEmit"
+	//"residual_time"				"6"
 	//"def_residual_damage"			"damage_lightTank_residualPlasma"	
 
 
@@ -388,8 +391,8 @@ entityDef damage_napalmSplash
 
 entityDef damage_napalmGlobEmit
 {
-	"damage"					"15"
-	"radius"					"140"
+	"damage"					"20"
+	"radius"					"450"
 	"attackerDamageScale"		"1.0"
 	"knockback"					"0"
 	"gib"						"0"

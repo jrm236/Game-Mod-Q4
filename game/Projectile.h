@@ -49,7 +49,8 @@ public :
 
 	// Added for grenade launcher
 	void					BounceExplode( const trace_t& collision );
-
+	// Added for garlic or napalm gun
+	void					StartResidualDamage( void );
 
 	void					Fizzle( void );
 
