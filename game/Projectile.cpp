@@ -449,23 +449,30 @@ void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 
 	physicsObj.SetOrigin( start );
 	physicsObj.SetAxis( dir.ToMat3() );
 
+	// Made changes so that the grenades actually get affect from multi bounce explosion
+
 	if ( !gameLocal.isClient ) {
-		if ( fuse <= 0 ) {
-			// run physics for 1 second
+
+		if (spawnArgs.GetBool("multi_bounce_explosion")) {
+
+		} 
+		else if (fuse <= 0) {
 			RunPhysics();
-			PostEventMS( &EV_Remove, spawnArgs.GetInt( "remove_time", "1500" ) );
-		} else if ( spawnArgs.GetBool( "detonate_on_fuse" ) ) {
+			PostEventMS(&EV_Remove, spawnArgs.GetInt("remove_time", "1500"));
+		}
+		else if (spawnArgs.GetBool("detonate_on_fuse")) {
 			fuse -= timeSinceFire;
-			if ( fuse < 0.0f ) {
+			if (fuse < 0.0f) {
 				fuse = 0.0f;
 			}
-			PostEventSec( &EV_Explode, fuse );
-		} else {
+			PostEventSec(&EV_Explode, fuse);
+		}
+		else {
 			fuse -= timeSinceFire;
-			if ( fuse < 0.0f ) {
+			if (fuse < 0.0f) {
 				fuse = 0.0f;
 			}
-			PostEventSec( &EV_Fizzle, fuse );
+			PostEventSec(&EV_Fizzle, fuse);
 		}
 	}
 
@@ -795,9 +802,21 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
 			bounce = !projectileFlags.detonate_on_bounce;
 		}
 		
+		// Modified bounce to work with the changes made to the Grenade Lancher
+
 		if ( bounce ) {
 			if ( bounceCount != -1 ) {
 				bounceCount--;
+			}
+
+			if ( spawnArgs.GetBool("multi_bounce_explosion" )) {
+				if ( bounceCount == 0 ) {
+					Explode( &collision, true );
+					return true;
+				}
+				else {
+					BounceExplode( collision );
+				}
 			}
 			
 			StartSound( "snd_ricochet", SND_CHANNEL_ITEM, 0, true, NULL );
@@ -1127,6 +1146,26 @@ void idProjectile::Event_ResidualDamage ( idEntity* ignore ) {
 
 	// Keep the loop going
 	PostEventSec ( &EV_ResidualDamage, spawnArgs.GetFloat ( "delay_residual" ), ignore );
+}
+
+/*
+================
+idProjectile::BounceExplode
+================
+*/
+void idProjectile::BounceExplode(const trace_t& collision) {
+
+	if (gameLocal.isClient) {
+		return;
+	}
+
+	PlayDetonateEffect( collision.endpos, collision.c.normal.ToMat3());
+
+	const char* splashDamage = spawnArgs.GetString( "def_splash_damage" );
+	if (splashDamage[0] != '\0') {
+		gameLocal.RadiusDamage(collision.endpos, this, owner, NULL, this, splashDamage, damagePower, &hitCount);
+	}
+
 }
 
 /*

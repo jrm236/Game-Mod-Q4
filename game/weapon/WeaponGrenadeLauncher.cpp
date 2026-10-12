@@ -29,6 +29,8 @@ private:
 	const char*			GetIdleAnim() const { return (!AmmoInClip()) ? "idle_empty" : "idle"; }
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponGrenadeLauncher );
+
+	int					burstCount;
 };
 
 CLASS_DECLARATION( rvWeapon, rvWeaponGrenadeLauncher )
@@ -49,6 +51,8 @@ rvWeaponGrenadeLauncher::Spawn
 */
 void rvWeaponGrenadeLauncher::Spawn ( void ) {
 	SetState ( "Raise", 0 );	
+
+	burstCount = 0;
 }
 
 /*
@@ -102,7 +106,11 @@ stateResult_t rvWeaponGrenadeLauncher::State_Idle( const stateParms_t& parms ) {
 			PlayCycle( ANIMCHANNEL_ALL, GetIdleAnim(), parms.blendFrames );
 			return SRESULT_STAGE ( STAGE_WAIT );
 		
-		case STAGE_WAIT:			
+		case STAGE_WAIT:	
+			if ( !wsfl.attack && burstCount >= 5 ) {
+				burstCount = 0;
+			}
+
 			if ( wsfl.lowerWeapon ) {
 				SetState ( "Lower", 4 );
 				return SRESULT_DONE;
@@ -113,7 +121,7 @@ stateResult_t rvWeaponGrenadeLauncher::State_Idle( const stateParms_t& parms ) {
 					return SRESULT_DONE;
 				}
 			} else { 
-				if ( gameLocal.time > nextAttackTime && wsfl.attack && AmmoInClip ( ) ) {
+				if ( gameLocal.time > nextAttackTime && wsfl.attack && AmmoInClip() && burstCount == 0 ) {
 					SetState ( "Fire", 0 );
 					return SRESULT_DONE;
 				}  
@@ -144,13 +152,14 @@ stateResult_t rvWeaponGrenadeLauncher::State_Fire ( const stateParms_t& parms ) 
 	};	
 	switch ( parms.stage ) {
 		case STAGE_INIT:
-			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
+			burstCount++;
 			Attack ( false, 1, spread, 0, 1.0f );
+			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
 			PlayAnim ( ANIMCHANNEL_ALL, GetFireAnim(), 0 );	
 			return SRESULT_STAGE ( STAGE_WAIT );
 	
 		case STAGE_WAIT:		
-			if ( wsfl.attack && gameLocal.time >= nextAttackTime && AmmoInClip() && !wsfl.lowerWeapon ) {
+			if ( burstCount < 5 && gameLocal.time >= nextAttackTime && AmmoInClip() && !wsfl.lowerWeapon ) {
 				SetState ( "Fire", 0 );
 				return SRESULT_DONE;
 			}
