@@ -503,17 +503,17 @@ stateResult_t rvWeaponBlaster::State_Fire ( const stateParms_t& parms ) {
 
 				int extraMissiles = 0;
 
-				if ( gameLocal.time - fireHeldTime > chargeTime + 500 ) {
-					extraMissiles = 1;
+				if ( gameLocal.time - fireHeldTime > chargeTime + 3000 ) {
+					extraMissiles = 9;
 				}
-				if ( gameLocal.time - fireHeldTime > chargeTime + 1000 ) {
-					extraMissiles = 2;
-				}
-				if ( gameLocal.time - fireHeldTime > chargeTime + 1500 ) {
+				else if ( gameLocal.time - fireHeldTime > chargeTime + 1500 ) {
 					extraMissiles = 4;
 				}
-				if (gameLocal.time - fireHeldTime > chargeTime + 3000) {
-					extraMissiles = 9;
+				else if ( gameLocal.time - fireHeldTime > chargeTime + 1000 ) {
+					extraMissiles = 2;
+				}
+				else if (gameLocal.time - fireHeldTime > chargeTime + 500) {
+					extraMissiles = 1;
 				}
 				Attack ( true, 1 + extraMissiles, spread, 0, 1.0f );
 				PlayEffect ( "fx_chargedflash", barrelJointView, false );

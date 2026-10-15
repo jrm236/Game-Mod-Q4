@@ -1158,6 +1158,23 @@ void Cmd_Spawn_f( const idCmdArgs &args ) {
 #endif // !_MPBETA
 }
 
+// Added for my mod, allows for the player to start the gamemode. Enemies will spawn around player.
+
+/*
+=================
+Cmd_Survivor_Mode_f
+=================
+*/
+void Cmd_Survivor_Mode_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+
+	if (!player) {
+		return;
+	}
+
+	player->StartSurvivorMode();
+}
+
 // RAVEN BEGIN
 // ddynerman: MP spawning command for performance testing
 /*
@@ -3232,6 +3249,9 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
+
+//Commands for my mod
+	cmdSystem->AddCommand( "survivorMode",			Cmd_Survivor_Mode_f,		CMD_FL_GAME | CMD_FL_CHEAT,	"Begin survivor mode");
 
 }
 

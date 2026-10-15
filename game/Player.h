@@ -796,6 +796,9 @@ public:
 	void					ResetCash();
 // RITUAL END
 
+// Added for survivor mode
+	void					StartSurvivorMode( void );
+
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 
@@ -1154,6 +1157,13 @@ private:
 	stateResult_t			State_Legs_Land					( const stateParms_t& parms );
 	stateResult_t			State_Legs_Dead					( const stateParms_t& parms );
 	
+	//added for Suvivor mode
+	void					UpdateSurvivorMode(void);
+	void					SpawnNextWave(void);
+	bool					survivorModeActive;
+	int						survivorStartTime;
+	int						survivorNextSpawnTime;
+
  	CLASS_STATES_PROTOTYPE( idPlayer );
 };
 

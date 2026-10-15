@@ -1342,6 +1342,11 @@ idPlayer::idPlayer() {
 	teamAmmoRegenPending	= false;
 	teamDoubler			= NULL;		
 	teamDoublerPending		= false;
+
+	//Added for survivor mode
+	survivorModeActive		= false;
+	survivorStartTime		= 0;
+	survivorNextSpawnTime	= 0;
 }
 
 /*
@@ -9284,6 +9289,9 @@ Called every tic for each player
 */
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
+
+	//Added to update the survivor mode
+	UpdateSurvivorMode();
  
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
@@ -14078,3 +14086,159 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+//Survivor mod additions
+
+/*
+===============
+idPlayer::StartSurvivorMode
+===============
+*/
+void idPlayer::StartSurvivorMode( void ) {
+	survivorModeActive = true;
+	survivorStartTime = gameLocal.time;
+	survivorNextSpawnTime = gameLocal.time;
+
+	gameLocal.Printf( "Survivor Mode has begun\n" );
+}
+
+/*
+===============
+idPlayer::UpdateSurvivorMode
+===============
+*/
+void idPlayer::UpdateSurvivorMode( void ) {
+	if (!survivorModeActive) {
+		return;
+	}
+
+	if (gameLocal.time >= survivorNextSpawnTime) {
+		SpawnNextWave();
+		survivorNextSpawnTime = gameLocal.time + SEC2MS( 10.0f );
+	}
+}
+
+/*
+===============
+idPlayer::SpawnNextWave
+===============
+*/
+void idPlayer::SpawnNextWave( void ) {
+
+	const float spawnRadius = 600.0f;
+
+	int minEnemies = 1;
+	int maxEnemies = 2;
+	int elapsedTime = gameLocal.time - survivorStartTime;
+
+	// 20 minutes (7-7 enemies)
+	if (elapsedTime >= SEC2MS(1200.0f)) {
+		minEnemies = 7;
+		maxEnemies = 7;
+	}
+	// 15 minutes (5-7 enemies)
+	else if (elapsedTime >= SEC2MS(900.0f)) {
+		minEnemies = 5;
+		maxEnemies = 7;
+	}
+	// 10 minutes (3-7 enemies)
+	else if (elapsedTime >= SEC2MS(600.0f)) {
+		minEnemies = 3;
+		maxEnemies = 7;
+	}
+	// 9 minutes (2-7 enemies)
+	else if (elapsedTime >= SEC2MS(540.0f)) {
+		minEnemies = 2;
+		maxEnemies = 7;
+	}
+	// 7 minutes (2-6 enemies)
+	else if (elapsedTime >= SEC2MS(420.0f)) {
+		minEnemies = 2;
+		maxEnemies = 6;
+	}
+	// 5 minutes (2-5 enemies)
+	else if (elapsedTime >= SEC2MS(300.0f)) {
+		minEnemies = 2;
+		maxEnemies = 5;
+	}
+	// 3 minutes (1-4 enemies)
+	else if (elapsedTime >= SEC2MS(180.0f)) {
+		minEnemies = 1;
+		maxEnemies = 4;
+	}
+	// 1 minute (1-3 enemies)
+	else if (elapsedTime >= SEC2MS(60.0f)) {
+		minEnemies = 1;
+		maxEnemies = 3;
+	}
+
+	const int enemyCount = minEnemies + gameLocal.random.RandomInt(maxEnemies - minEnemies + 1);
+
+	for (int i = 0; i < enemyCount; i++) {
+		idDict dict;
+		const char* enemyType = "monster_strogg_marine";
+		float enemyRoll = gameLocal.random.RandomFloat();
+
+		// 9 minutes (5 enemy types)
+		if (elapsedTime >= SEC2MS(540.0f)) {
+			if (enemyRoll < 0.2f) {
+				enemyType = "monster_slimy_transfer";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.4f) {
+				enemyType = "monster_failed_transfer";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.6f) {
+				enemyType = "monster_grunt";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.8f) {
+				enemyType = "monster_berserker";
+			}
+			else {
+				enemyType = "monster_strogg_marine";
+			}
+		}
+		// 7 minutes (4 enemy types)
+		else if (elapsedTime >= SEC2MS(420.0f)) {
+			if (enemyRoll < 0.25f) {
+				enemyType = "monster_slimy_transfer";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.5f) {
+				enemyType = "monster_failed_transfer";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.75f) {
+				enemyType = "monster_grunt";
+			}
+			else {
+				enemyType = "monster_strogg_marine";
+			}
+		}
+		// 5 minutes (3 enemy types)
+		else if (elapsedTime >= SEC2MS(300.0f)) {
+			if (enemyRoll < 0.33f) {
+				enemyType = "monster_slimy_transfer";
+			}
+			else if (gameLocal.random.RandomFloat() < 0.66f) {
+				enemyType = "monster_failed_transfer";
+			}
+			else {
+				enemyType = "monster_strogg_marine";
+			}
+		}
+		// 3 minutes (2 enemy types)
+		else if (elapsedTime >= SEC2MS(180.0f)) {
+			if (enemyRoll < 0.5f) {
+				enemyType = "monster_slimy_transfer";
+			}
+		}
+
+		float angle = gameLocal.random.RandomFloat() * 360.0f;
+		idVec3 spawnPosition = GetPhysics()->GetOrigin() + idAngles(0, angle, 0).ToForward() * spawnRadius + idVec3(0, 0, 1);
+
+		dict.Set("classname", enemyType);
+		dict.Set("origin", spawnPosition.ToString());
+
+		idEntity* newEnemy = NULL;
+		gameLocal.SpawnEntityDef(dict, &newEnemy);
+
+	}
+}
