@@ -1347,6 +1347,10 @@ idPlayer::idPlayer() {
 	survivorModeActive		= false;
 	survivorStartTime		= 0;
 	survivorNextSpawnTime	= 0;
+	//Added for player levels
+	playerEXP				= 0;
+	playerCurrentLevel		= 1;
+	playerEXPToNextLevel	= 10;
 }
 
 /*
@@ -3442,6 +3446,21 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	}
 	
 	_hud->StateChanged( gameLocal.time );
+
+	//Added for survivor mode and player level up hud info
+	if (survivorModeActive) {
+		int totalTimePassed = (gameLocal.time - survivorStartTime) / 1000;
+		int minutes = totalTimePassed / 60;
+		int seconds = totalTimePassed % 60;
+
+		_hud->SetStateString("survivor_timer", va("%02d:%02d", minutes, seconds));
+		_hud->SetStateString("survivor_level", va("LV %d", playerCurrentLevel));
+		_hud->SetStateInt("survivor_xp", playerEXP);
+		_hud->SetStateInt("survivor_xp_needed", playerEXPToNextLevel);
+		_hud->SetStateString("survivor_xp_text", va("%d / %d", playerEXP, playerEXPToNextLevel));
+		_hud->SetStateFloat("survivor_xp_pct", (float)playerEXP / (float)playerEXPToNextLevel);
+
+	}
 }
 
 /*
@@ -14099,6 +14118,10 @@ void idPlayer::StartSurvivorMode( void ) {
 	survivorStartTime = gameLocal.time;
 	survivorNextSpawnTime = gameLocal.time;
 
+	playerEXP = 0;
+	playerCurrentLevel = 1;
+	playerEXPToNextLevel = 10;
+
 	gameLocal.Printf( "Survivor Mode has begun\n" );
 }
 
@@ -14236,9 +14259,34 @@ void idPlayer::SpawnNextWave( void ) {
 
 		dict.Set("classname", enemyType);
 		dict.Set("origin", spawnPosition.ToString());
+		dict.SetBool("survivor_enemy", true);
 
 		idEntity* newEnemy = NULL;
 		gameLocal.SpawnEntityDef(dict, &newEnemy);
 
+	}
+}
+
+/*
+===============
+idPlayer::AddPlayerEXP
+===============
+*/
+void idPlayer::AddPlayerEXP(int amount) {
+	if (!survivorModeActive) {
+		return;
+	}
+
+	playerEXP += amount;
+
+	gameLocal.Printf("Player XP: %d / %d\n", playerEXP, playerEXPToNextLevel);
+
+	if (playerEXP >= playerEXPToNextLevel) {
+		playerCurrentLevel++;
+
+		playerEXP -= playerEXPToNextLevel;
+		playerEXPToNextLevel += 5;
+
+		gameLocal.Printf("Player has leveled up! Level: %d\n", playerCurrentLevel);
 	}
 }

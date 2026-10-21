@@ -482,6 +482,7 @@ windowDef Desktop
 			set "main_b_help_info1::visible" "0";
 			set "main_b_help_info2::visible" "0";
 			set "main_b_help_info3::visible" "0";
+			set "main_b_help_info4::visible" "0";
 			
 			set "main_t_b1::text" "#str_200000" ;
 			set "main_t_b2::text" "#str_200001" ;
@@ -519,6 +520,7 @@ windowDef Desktop
 			set "main_b_help_info1::visible" "1";
 			set "main_b_help_info2::visible" "1";
 			set "main_b_help_info3::visible" "1";
+			set "main_b_help_info4::visible" "1";
 			
 			set "main_t_b1::text" "#str_200003" ;
 			set "main_t_b2::text" "#str_200001" ;
@@ -558,6 +560,7 @@ windowDef Desktop
 			set "main_b_help_info1::visible" "0";
 			set "main_b_help_info2::visible" "0";
 			set "main_b_help_info3::visible" "0";
+			set "main_b_help_info4::visible" "0";
 			
 			set "main_t_b1::text" "#str_200005" ;
 			set "main_t_b2::text" "#str_200006" ;
@@ -18994,6 +18997,7 @@ windowDef Desktop
 				set "main_b_help_info1::visible" "0";
 				set "main_b_help_info2::visible" "0";
 				set "main_b_help_info3::visible" "0";
+				set "main_b_help_info4::visible" "0";
 			} else if ("gui::ingame" == 1) {
 				set "main_b_returnmp::visible" "0" ;
 				set "main_b_newgame::visible" "0" ;
@@ -19009,6 +19013,7 @@ windowDef Desktop
 				set "main_b_help_info1::visible" "1" ;
 				set "main_b_help_info2::visible" "1" ;
 				set "main_b_help_info3::visible" "1" ;
+				set "main_b_help_info4::visible" "1" ;
 			} else if ("gui::ingame" == 2) {
 				set "main_b_returnmp::visible" "1" ;
 				set "main_b_newgame::visible" "0" ;
@@ -19024,6 +19029,7 @@ windowDef Desktop
 				set "main_b_help_info1::visible" "0" ;
 				set "main_b_help_info2::visible" "0" ;
 				set "main_b_help_info3::visible" "0" ;
+				set "main_b_help_info4::visible" "0" ;
 			} 
 			set "main_b_loadgame::visible" "1" ;
 			set "main_b_settings::visible" "1" ;
@@ -19048,6 +19054,7 @@ windowDef Desktop
 			set "main_b_help_info1::visible" "0" ;
 			set "main_b_help_info2::visible" "0" ;
 			set "main_b_help_info3::visible" "0" ;
+			set "main_b_help_info4::visible" "0";
 		}
 
 		onNamedEvent showSet {
@@ -19980,7 +19987,7 @@ windowDef Desktop
 		}
 		windowDef main_b_help_info1
 		{
-			rect	400,192,207,38
+			rect	400,190,207,38
 			visible	0
 			forecolor	1,1,1,0.662
 			text	"#str_223011"
@@ -19990,7 +19997,7 @@ windowDef Desktop
 		}
 		windowDef main_b_help_info2
 		{
-			rect	400,233,208,38
+			rect	400,230,208,38
 			visible	0
 			forecolor	1,1,1,0.662
 			text	"#str_223012"
@@ -20000,10 +20007,20 @@ windowDef Desktop
 		}
 		windowDef main_b_help_info3
 		{
-			rect	400,273,209,38
+			rect	400,270,209,38
 			visible	0
-			forecolor	1,1,1,0.650
+			forecolor	1,1,1,0.643
 			text	"#str_223013"
+			textscale	0.2
+			textalign	1
+			font	"fonts/lowpixel"
+		}
+		windowDef main_b_help_info4
+		{
+			rect	400,310,209,38
+			visible	0
+			forecolor	1,1,1,0.635
+			text	"#str_223014"
 			textscale	0.2
 			textalign	1
 			font	"fonts/lowpixel"

@@ -798,6 +798,8 @@ public:
 
 // Added for survivor mode
 	void					StartSurvivorMode( void );
+// Added for player levels
+	void					AddPlayerEXP( int amount );
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
@@ -1163,6 +1165,11 @@ private:
 	bool					survivorModeActive;
 	int						survivorStartTime;
 	int						survivorNextSpawnTime;
+
+	//added for player levelups
+	int						playerEXP;
+	int						playerCurrentLevel;
+	int						playerEXPToNextLevel;
 
  	CLASS_STATES_PROTOTYPE( idPlayer );
 };

@@ -1642,6 +1642,14 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 
 	aifl.dead = true;
 
+	// Added to reward player xp on kill
+	if (spawnArgs.GetBool("survivor_enemy")) {
+		if (attacker && attacker->IsType(idPlayer::GetClassType())) {
+			idPlayer* player = static_cast<idPlayer*>(attacker);
+			player->AddPlayerEXP(1);
+		}
+	}
+
 	// turn off my flashlight, if I had one
 	ProcessEvent( &AI_Flashlight, false );
 
