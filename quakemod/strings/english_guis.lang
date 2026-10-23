@@ -1119,6 +1119,7 @@
 
 	"#str_223010"	"Mod Info"
 	"#str_223011"   "Gain Experience By Killing Enemies"
-	"#str_223012"   "Level Up To Unlock New Weapons"
+	"#str_223012"   "Level Up To Unlock New Weapons and stat ups"
 	"#str_223013"   "Survive Enemy Waves As Long As Possible"
+	"#str_223014"	"Type survivorMode Into Console To Start"
 }

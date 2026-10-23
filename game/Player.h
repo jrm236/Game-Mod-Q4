@@ -800,6 +800,10 @@ public:
 	void					StartSurvivorMode( void );
 // Added for player levels
 	void					AddPlayerEXP( int amount );
+// Added for item selection
+	void					StartSurvivorLevelUp(void);
+	void					ApplySurvivorReward(int reward);
+	const char*				GetSurvivorRewardName(int reward);
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
@@ -1170,6 +1174,30 @@ private:
 	int						playerEXP;
 	int						playerCurrentLevel;
 	int						playerEXPToNextLevel;
+	
+	//added for item selection on level up
+	int						playerReward1;
+	int						playerReward2;
+	int						playerReward3;
+
+	enum survivorRewards {
+		SURVIVOR_QUADDAMAGE,
+		SURVIVOR_HASTE,
+		SURVIVOR_AMMOREGEN,
+		SURVIVOR_MACHINEGUN,
+		SURVIVOR_NAILGUN,
+		SURVIVOR_SHOTGUN,
+		SURVIVOR_DMG,
+		SURVIVOR_GRENADELAUNCHER,
+		SURVIVOR_LIGHTNINGGUN,
+		SURVIVOR_ROCKETLAUNCHER,
+		SURVIVOR_NAPALMGUN,
+		SURVIVOR_RAILGUN,
+		SURVIVOR_TOTALREWARDS
+	};
+
+	bool					playerLevelUpActive;
+	bool					playerRewardOwned[SURVIVOR_TOTALREWARDS];
 
  	CLASS_STATES_PROTOTYPE( idPlayer );
 };

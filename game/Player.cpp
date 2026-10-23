@@ -1351,6 +1351,15 @@ idPlayer::idPlayer() {
 	playerEXP				= 0;
 	playerCurrentLevel		= 1;
 	playerEXPToNextLevel	= 10;
+	//Added for item selection
+	playerLevelUpActive		= false;
+	playerReward1			= -1;
+	playerReward2			= -1;
+	playerReward3			= -1;
+
+	for (int i = 0; i < SURVIVOR_TOTALREWARDS; i++) {
+		playerRewardOwned[i] = false;
+	}
 }
 
 /*
@@ -3459,6 +3468,11 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateInt("survivor_xp_needed", playerEXPToNextLevel);
 		_hud->SetStateString("survivor_xp_text", va("%d / %d", playerEXP, playerEXPToNextLevel));
 		_hud->SetStateFloat("survivor_xp_pct", (float)playerEXP / (float)playerEXPToNextLevel);
+	//Added for item selection on level uo
+		_hud->SetStateBool("survivor_levelup_active", playerLevelUpActive);
+		_hud->SetStateString("survivor_reward1", GetSurvivorRewardName(playerReward1));
+		_hud->SetStateString("survivor_reward2", GetSurvivorRewardName(playerReward2));
+		_hud->SetStateString("survivor_reward3", GetSurvivorRewardName(playerReward3));
 
 	}
 }
@@ -8477,6 +8491,23 @@ void idPlayer::PerformImpulse( int impulse ) {
 		msg.BeginWriting();
 		msg.WriteBits( impulse, IMPULSE_NUMBER_OF_BITS );
 		ClientSendEvent( EVENT_IMPULSE, &msg );
+	}
+
+	//Added to stop weapon scrolling while selecting weapon from level up
+	if (playerLevelUpActive) {
+		if (impulse == IMPULSE_0) {
+			ApplySurvivorReward(1);
+			return;
+		}
+		else if (impulse == IMPULSE_1) {
+			ApplySurvivorReward(2);
+			return;
+		}
+		else if (impulse == IMPULSE_2) {
+			ApplySurvivorReward(3);
+			return;
+		}
+		
 	}
 
 	if ( impulse >= IMPULSE_0 && impulse <= IMPULSE_12 ) {
@@ -14288,5 +14319,167 @@ void idPlayer::AddPlayerEXP(int amount) {
 		playerEXPToNextLevel += 5;
 
 		gameLocal.Printf("Player has leveled up! Level: %d\n", playerCurrentLevel);
+
+		StartSurvivorLevelUp();
 	}
+}
+
+/*
+===============
+idPlayer::StartSurvivorLevelUp
+===============
+*/
+void idPlayer::StartSurvivorLevelUp(void) {
+	playerLevelUpActive = true;
+
+	int availableRewards[SURVIVOR_TOTALREWARDS];
+	int availableCount = 0;
+
+	for (int i = 0; i < SURVIVOR_TOTALREWARDS; i++) {
+		if (!playerRewardOwned[i]) {
+			availableRewards[availableCount] = i;
+			availableCount++;
+		}
+	}
+
+	if (availableCount <= 0) {
+		gameLocal.Printf("No more selectable upgrades");
+		playerLevelUpActive = false;
+		return;
+	}
+	
+	int randomReward = gameLocal.random.RandomInt(availableCount);
+	playerReward1 = availableRewards[randomReward];
+	availableRewards[randomReward] = availableRewards[availableCount - 1];
+	availableCount--;
+
+	if (availableCount > 0) {
+		randomReward = gameLocal.random.RandomInt(availableCount);
+		playerReward2 = availableRewards[randomReward];
+		availableRewards[randomReward] = availableRewards[availableCount - 1];
+		availableCount--;
+	}
+	else {
+		playerReward2 = -1;
+	}
+
+	if (availableCount > 0) {
+		randomReward = gameLocal.random.RandomInt(availableCount);
+		playerReward3 = availableRewards[randomReward];
+	}
+	else {
+		playerReward3 = -1;
+	}
+
+	gameLocal.Printf("Choose a reward: [1] [2] [3]\n");
+}
+
+/*
+===============
+idPlayer::ApplySurvivorReward
+===============
+*/
+void idPlayer::ApplySurvivorReward(int reward) {
+	if (!playerLevelUpActive) {
+		return;
+	}
+
+	int selectedReward;
+
+	if (reward == 1) {
+		selectedReward = playerReward1;
+	}
+	else if (reward == 2) {
+		selectedReward = playerReward2;
+	}
+	else if (reward == 3) {
+		selectedReward = playerReward3;
+	}
+	else {
+		return;
+	}
+
+	gameLocal.Printf("Selected reward: %d\n", selectedReward);
+
+	switch (selectedReward) {
+		case SURVIVOR_QUADDAMAGE:
+			GivePowerUp(POWERUP_QUADDAMAGE, -1);
+			break;
+		case SURVIVOR_HASTE:
+			GivePowerUp(POWERUP_HASTE, -1);
+			break;
+		case SURVIVOR_AMMOREGEN:
+			GivePowerUp(POWERUP_AMMOREGEN, -1);
+			break;
+		case SURVIVOR_MACHINEGUN:
+			GiveItem("weapon_machinegun");
+			break;
+		case SURVIVOR_NAILGUN:
+			GiveItem("weapon_nailgun");
+			break;
+		case SURVIVOR_SHOTGUN:
+			GiveItem("weapon_shotgun");
+			break;
+		case SURVIVOR_DMG:
+			GiveItem("weapon_dmg");
+			break;
+		case SURVIVOR_GRENADELAUNCHER:
+			GiveItem("weapon_grenadelauncher");
+			break;
+		case SURVIVOR_LIGHTNINGGUN:
+			GiveItem("weapon_lightninggun");
+			break;
+		case SURVIVOR_ROCKETLAUNCHER:
+			GiveItem("weapon_rocketlauncher");
+			break;
+		case SURVIVOR_NAPALMGUN:
+			GiveItem("weapon_napalmgun");
+			break;
+		case SURVIVOR_RAILGUN:
+			GiveItem("weapon_railgun");
+			break;
+		default:
+			return;
+	}
+
+	playerRewardOwned[selectedReward] = true;
+
+	playerLevelUpActive = false;
+}
+
+/*
+===============
+idPlayer::GetSurvivorRewardName
+===============
+*/
+const char* idPlayer::GetSurvivorRewardName(int reward) {
+
+	switch (reward) {
+		case SURVIVOR_QUADDAMAGE:
+			return "Quad Damage";
+		case SURVIVOR_HASTE:
+			return "Haste";
+		case SURVIVOR_AMMOREGEN:
+			return "Ammo Regen";
+		case SURVIVOR_MACHINEGUN:
+			return "Machinegun";
+		case SURVIVOR_NAILGUN:
+			return "Nailgun";
+		case SURVIVOR_SHOTGUN:
+			return "Shotgun";
+		case SURVIVOR_DMG:
+			return "Dark Matter Gun";
+		case SURVIVOR_GRENADELAUNCHER:
+			return "Grenade Launcher";
+		case SURVIVOR_LIGHTNINGGUN:
+			return "Lightning Gun";
+		case SURVIVOR_ROCKETLAUNCHER:
+			return "Rocket Launcher";
+		case SURVIVOR_NAPALMGUN:
+			return "Napalmgun";
+		case SURVIVOR_RAILGUN:
+			return "Railgun";
+	}
+
+	return "NOTHING";
 }

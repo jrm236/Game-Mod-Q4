@@ -24,7 +24,7 @@ windowDef Desktop
 	float	"hidden"	0
 	float	"deathCount"	0
 	definefloat	"showGunInfo"	1
-	definefloat	"switchLeft"	(640 - (("gui::weaponcount" * 30) - 2)) / 2
+	definefloat	"switchLeft"	(640-((gui::weaponcount*30)-2)) / 2
 
 	onInit {
 		namedEvent "updateHealth";
@@ -567,6 +567,90 @@ windowDef Desktop
 			text	"#str_200978"
 			textscale	0.12
 			font	"fonts/lowpixel"
+		}
+	}
+	windowDef p_survivor_levelup
+	{
+		rect	0,0,640,480
+		visible	"gui::survivor_levelup_active"
+		windowDef p_survivor_levelup_background
+		{
+			rect	0,0,640,480
+			visible	1
+			backcolor	0,0,0,0.396
+		}
+		windowDef p_survivor_levelup_title
+		{
+			rect	220,120,200,50
+			visible	1
+			forecolor	1,1,1,1
+			text	"LEVEL UP!"
+			textscale	0.5
+			font	"fonts/marine"
+			textalign	1
+		}
+		windowDef p_survivor_levelup_reward1_title
+		{
+			rect	110,180,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"[1]"
+			textscale	0.3
+			font	"fonts/marine"
+			textalign	1
+		}
+		windowDef p_survivor_levelup_reward1
+		{
+			rect	110,204,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"gui::survivor_reward1"
+			textscale	0.25
+			font	"fonts/marine"
+			textalign	1
+			backcolor	0,0,0,1
+		}
+		windowDef p_survivor_levelup_reward2_title
+		{
+			rect	260,180,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"[2]"
+			textscale	0.3
+			font	"fonts/marine"
+			textalign	1
+		}
+		windowDef p_survivor_levelup_reward2
+		{
+			rect	260,204,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"gui::survivor_reward2"
+			textscale	0.25
+			font	"fonts/marine"
+			textalign	1
+			backcolor	0,0,0,1
+		}
+		windowDef p_survivor_levelup_reward3_title
+		{
+			rect	410,180,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"[3]"
+			textscale	0.3
+			font	"fonts/marine"
+			textalign	1
+		}
+		windowDef p_survivor_levelup_reward3
+		{
+			rect	410,204,123,109
+			visible	1
+			forecolor	1,1,1,1
+			text	"gui::survivor_reward3"
+			textscale	0.25
+			font	"fonts/marine"
+			textalign	1
+			backcolor	0,0,0,1
 		}
 	}
 	windowDef p_survivor
