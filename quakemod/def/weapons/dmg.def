@@ -263,7 +263,6 @@ entityDef damage_dmg_fly
 	"pain"						"stream"
 	"cower"						"1"
 
-
 /*
 	// Hearing Loss
 	"hl_volumeDB"				"-25"
@@ -308,19 +307,28 @@ entityDef projectile_dmg
 	"def_radius_damage"			"damage_dmg_fly"
 	"damageRate"				".05"
 																											
-	"speed"					"250"
+	"speed"					"450"
 	
 	"delay_splash"				".45"
 	
 	"linear_friction"			"0"
 	"angular_friction"			"0"
 	"contact_friction"			"10"
-	"fuse"					"10"
+	"fuse"						"10"
+
+	"gravity"					"1.2"
+
+	"bounce"					"1"
+	"bounce_count"				"12"
 								
-	"detonate_on_fuse"			"1"
+	"detonate_on_fuse"			"0"
 	"detonate_on_death"			"0"
-	"detonate_on_world"			"1"
-	"detonate_on_actor"			"0"
+	"detonate_on_world"			"0"
+	"detonate_on_actor"			"1"
+
+	"turn_max"      "360"
+	"turn_accel"    "10"
+	"min_dist"      "0"
 								
 	"impact_gib"				"1"								
 	"decal_size"				"75"
@@ -400,7 +408,7 @@ entityDef projectile_dmg_mp
 	"def_splash_damage"			"damage_dmg_splash_mp"
 																											
 	"speed"						"350"
-	"fuse"						"10"
+	"fuse"						"3"
 	"push"						"48000"
 	
 	"predictTime"				"50"
@@ -429,4 +437,16 @@ entityDef projectile_dmg_mp
 	"fx_teleport"				"effects/mp/item_teleport.fx"
 
 	"no_impact_prediction"		"1"
+}
+
+entityDef projectile_dmg_grenade
+{
+	"inherit"					"projectile_grenade"
+	"multi_bounce_explosion"	"0"
+	"speed"						"0"
+
+	"detonate_on_world"			"0"
+	"detonate_on_actor"			"1"
+
+	"fuse"						"1"
 }

@@ -57,6 +57,10 @@ private:
 	stateResult_t		State_Reload	( const stateParms_t& parms );
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponDarkMatterGun );
+
+	//Just reused from the homing code i made from the blaster
+	virtual void		OnLaunchProjectile(idProjectile* proj);
+	idEntity*			FindMissileTarget(void);
 };
 
 CLASS_DECLARATION( rvWeapon, rvWeaponDarkMatterGun )
@@ -228,6 +232,74 @@ void rvWeaponDarkMatterGun::StopRings ( void ) {
 	
 	ringStartTime  = -1;
 }
+//Copy pasted from blaster homing code
+/*
+================
+rvWeaponDarkMatterGun::OnLaunchProjectile
+================
+*/
+void rvWeaponDarkMatterGun::OnLaunchProjectile(idProjectile* proj) {
+	rvWeapon::OnLaunchProjectile(proj);
+
+	idGuidedProjectile* guided;
+	guided = dynamic_cast<idGuidedProjectile*>(proj);
+
+	idEntity* target = FindMissileTarget();
+
+	if (!guided) {
+		return;
+	}
+
+	if (target) {
+		guided->GuideTo(target);
+	}
+}
+/*
+================
+rvWeaponDarkMatterGun::fIndMissileTarget
+================
+*/
+idEntity* rvWeaponDarkMatterGun::FindMissileTarget(void) {
+	const float targetRadius = 1500.0f;
+	idEntity* chosenTarget = NULL;
+	float bestDistance = targetRadius;
+
+	for (int i = 0; i < gameLocal.num_entities; i++) {
+
+		idEntity* ent = gameLocal.entities[i];
+
+		if (!ent) {
+			continue;
+		}
+
+		if (!ent->IsType(idActor::GetClassType())) {
+			continue;
+		}
+
+		idActor* actor = static_cast<idActor*>(ent);
+
+		if (actor == owner) {
+			continue;
+		}
+
+		if (actor->health <= 0) {
+			continue;
+		}
+
+		if (actor->team == owner->team) {
+			continue;
+		}
+
+		float distance = (actor->GetPhysics()->GetOrigin() - playerViewOrigin).Length();
+
+		if (distance < bestDistance) {
+			bestDistance = distance;
+			chosenTarget = actor;
+		}
+	}
+
+	return chosenTarget;
+}
 
 /*
 ===============================================================================
@@ -381,8 +453,8 @@ stateResult_t rvWeaponDarkMatterGun::State_Reload ( const stateParms_t& parms ) 
 
 ===============================================================================
 */
-
-class rvDarkMatterProjectile : public idProjectile {
+// Made changes to make it a homing projectile
+class rvDarkMatterProjectile : public idGuidedProjectile {
 public :
 	CLASS_PROTOTYPE( rvDarkMatterProjectile );
 	
@@ -401,8 +473,8 @@ protected:
 	int					nextDamageTime;
 	const idDict*		radiusDamageDef;
 };
-
-CLASS_DECLARATION( idProjectile, rvDarkMatterProjectile )
+//Changed to make it a homing proj
+CLASS_DECLARATION( idGuidedProjectile, rvDarkMatterProjectile )
 END_CLASS
 
 /*
@@ -459,7 +531,8 @@ rvDarkMatterProjectile::Think
 */
 void rvDarkMatterProjectile::Think ( void ) {
 	physicsObj.SetClipMask( MASK_DMGSOLID );
-	idProjectile::Think ( );
+	//changed to homing proj
+	idGuidedProjectile::Think ( );
 
 	if ( gameLocal.time > nextDamageTime ) {
 		gameLocal.RadiusDamage ( GetPhysics()->GetOrigin(), this, owner, owner, NULL, spawnArgs.GetString( "def_radius_damage" ), 1.0f, &hitCount );

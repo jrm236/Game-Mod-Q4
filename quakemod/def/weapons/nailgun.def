@@ -88,7 +88,7 @@ entityDef weapon_nailgun
 	"spawnclass"				"idItem"
 	"weaponclass"				"rvWeaponNailgun"
 	"size"						"32 32 32"
-	//"model_view" 				"weapon_nailgun_view"
+	// "model_view" 				"weapon_nailgun_view"
 	"model_view_strogg" 		"weapon_nailgun_view_strogg"
   	"model_world"				"weapon_nailgun_world"
 	"model"						"models/weapons/nailgun/w_ng.lwo"
@@ -481,7 +481,7 @@ entityDef projectile_nail_seek
 
 entityDef damage_nailDirect 
 {
-	"damage"					"25"
+	"damage"					"40"
 //	"push"						"1000"
 	"gib"						"0"
 
@@ -494,7 +494,7 @@ entityDef damage_nailDirect
 
 entityDef damage_nailSplash 
 {
-	"damage"					"25"
+	"damage"					"40"
 	"radius"					"50"
 	"knockback"					"5"
 	"push"						"0"

@@ -80,6 +80,7 @@ entityDef weapon_shotgun
 	"joint_world_flash"			"muzzle_flash"
 
 	"fireRate"				".8"
+	"reloadRate"			".3"
 	"spread"				"7"
 	"hitscans"				"10"
 
@@ -90,10 +91,14 @@ entityDef weapon_shotgun
 	"inv_name"				"#str_107410"
 
 	"weaponname"				"Shotgun"
-	"def_hitscan"				"hitscan_shotgun_pellet"
+	//"def_hitscan"				"hitscan_shotgun_pellet"	
+	"def_projectile"			"projectile_shotgun_dmg"
+	// Changed to make the shotgun spreadshot
+	"fixedSpreadshot"			"1"
+
 	"mtr_crosshair"				"gfx/guis/crosshairs/crosshair_shotgun"
 	"ammoType"				"ammo_shotgun"
-	"clipSize"				"8"
+	"clipSize"				"9"
 	"ammoRequired"				"1"
 	"gui"					"guis/weapons/shotgun_ammo.gui"
 	"mtr_icon"				"gfx/guis/hud/icons/gun_shotgun"
@@ -350,6 +355,27 @@ entityDef damage_pellet_mp
 	"inherit"					"damage_pellet"
 	"knockback"					"10"
 	"damage"					"10"
+}
+
+//Added to make it shoot out grenades instead of pellets
+entityDef projectile_shotgun_grenade
+{
+	"inherit"					"projectile_grenade"
+	"multi_bounce_explosion"	"0"
+	"speed"						"1000"
+
+	"detonate_on_world"			"1"
+	"detonate_on_actor"			"1"
+}
+
+entityDef projectile_shotgun_dmg
+{
+	"inherit"					"projectile_dmg"
+	"speed"						"1000"
+	"gravity"					"0"
+
+	"detonate_on_world"			"1"
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------

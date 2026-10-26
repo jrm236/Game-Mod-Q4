@@ -34,6 +34,8 @@ private:
 	stateResult_t		State_Flashlight	( const stateParms_t& parms );
 
 	CLASS_STATES_PROTOTYPE ( rvWeaponMachinegun );
+
+	int					burstCount;
 };
 
 CLASS_DECLARATION( rvWeapon, rvWeaponMachinegun )
@@ -54,7 +56,8 @@ rvWeaponMachinegun::Spawn
 */
 void rvWeaponMachinegun::Spawn ( void ) {
 	spreadZoom = spawnArgs.GetFloat ( "spreadZoom" );
-	fireHeld   = false;
+	fireHeld = false;
+	burstCount = 0;
 		
 	SetState ( "Raise", 0 );	
 	
@@ -232,17 +235,31 @@ stateResult_t rvWeaponMachinegun::State_Fire ( const stateParms_t& parms ) {
 				fireHeld = true;
 			} else {
 				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-				Attack ( false, 1, spread, 0, 1.0f );
+				Attack(false, 1, 7, 0, 1.0f);
+				Attack(false, 1, 5, 0, 1.0f );
+				Attack(false, 1, 2, 0, 1.0f);
+				Attack(false, 1, 0, 0, 1.0f);
+				Attack(false, 1, -2, 0, 1.0f);
+				Attack(false, 1, -5, 0, 1.0f);
+				Attack(false, 1, -7, 0, 1.0f);
+				burstCount++;
 			}
 			PlayAnim ( ANIMCHANNEL_ALL, "fire", 0 );	
 			return SRESULT_STAGE ( STAGE_WAIT );
 	
 		case STAGE_WAIT:		
-			if ( !fireHeld && wsfl.attack && gameLocal.time >= nextAttackTime && AmmoInClip() && !wsfl.lowerWeapon ) {
-				SetState ( "Fire", 0 );
-				return SRESULT_DONE;
+			if (!wsfl.zoom) {
+				if (burstCount < 5 && gameLocal.time >= nextAttackTime && AmmoInClip()) {
+					SetState("Fire", 0);
+					return SRESULT_DONE;
+				}
+				if (burstCount >= 5) {
+					burstCount = 0;
+					SetState("Idle", 0);
+					return SRESULT_DONE;
+				}
 			}
-			if ( AnimDone ( ANIMCHANNEL_ALL, 0 ) ) {
+			if ( wsfl.zoom && AnimDone ( ANIMCHANNEL_ALL, 0 ) ) {
 				SetState ( "Idle", 0 );
 				return SRESULT_DONE;
 			}		

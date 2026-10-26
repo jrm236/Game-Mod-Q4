@@ -392,7 +392,7 @@ entityDef damage_napalmSplash
 entityDef damage_napalmGlobEmit
 {
 	"damage"					"20"
-	"radius"					"450"
+	"radius"					"650"
 	"attackerDamageScale"		"1.0"
 	"knockback"					"0"
 	"gib"						"0"

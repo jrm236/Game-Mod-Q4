@@ -2642,9 +2642,17 @@ void rvWeapon::LaunchProjectiles ( idDict& dict, const idVec3& muzzleOrigin, con
 		idBounds projBounds;
 		idVec3	 muzzle_pos;
 		
-		// Calculate a random launch direction based on the spread
-		ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
-		spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
+		//Added to make a spread shot function at specific angles
+		if (spawnArgs.GetBool("fixedSpreadshot")) {
+			ang = idMath::Sin(spreadRad);
+			spin = (float)DEG2RAD(360.0f);
+		}
+
+		else {
+			// Calculate a random launch direction based on the spread
+			ang = idMath::Sin(spreadRad * gameLocal.random.RandomFloat());
+			spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+		}
 //RAVEN BEGIN
 //asalmon: xbox must use muzzle Axis for aim assistance
 #ifdef _XBOX
@@ -2806,9 +2814,17 @@ void rvWeapon::Hitscan( const idDict& dict, const idVec3& muzzleOrigin, const id
 			end += ( u * playerViewAxis[ 2 ] );
 #endif
 			dir = end - muzzleOrigin;
-		} else {
-			ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
-			spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
+		} 		
+		//Did the same to make it work with hit scan weapons now
+		else {
+			if (spawnArgs.GetBool("fixedSpreadshot")) {
+				ang = idMath::Sin(spreadRad);
+				spin = (float)DEG2RAD(360.0f);
+			}
+			else {
+				ang = idMath::Sin(spreadRad * gameLocal.random.RandomFloat());
+				spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+			}
 			//RAVEN BEGIN
 			//asalmon: xbox must use the muzzleAxis so the aim can be adjusted for aim assistance
 #ifdef _XBOX
