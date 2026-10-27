@@ -90,6 +90,8 @@ private:
 
 	void				Event_RestoreHum	( void );
 
+	int					lightningbeamHeldDown;
+
 	CLASS_STATES_PROTOTYPE ( rvWeaponLightningGun );
 };
 
@@ -134,6 +136,9 @@ rvWeaponLightningGun::Spawn
 void rvWeaponLightningGun::Spawn( void ) {
 	int i;
 	
+	//added to make the beam sway
+	lightningbeamHeldDown = 0;
+
 	trailEffectView = NULL;
 	nextCrawlTime	= 0;
 
@@ -263,6 +268,10 @@ void rvWeaponLightningGun::Think ( void ) {
 
 	// If no longer firing or out of ammo then nothing to do in the think
 	if ( !wsfl.attack || !IsReady() || !AmmoAvailable() ) {
+
+		// Added to reset the timer
+		lightningbeamHeldDown = 0;
+
 		if ( trailEffectView ) {
 			trailEffectView->Stop ( );
 			trailEffectView = NULL;
@@ -273,14 +282,35 @@ void rvWeaponLightningGun::Think ( void ) {
 		return;
 	}
 
+	//Make beam sway the more time held down
+	if (lightningbeamHeldDown == 0) {
+		lightningbeamHeldDown = gameLocal.time;
+	}
+
+	idVec3 firingDirection = playerViewAxis[0];
+	float totalHeldTime = MS2SEC(gameLocal.time - lightningbeamHeldDown);
+	float sweep = totalHeldTime * 0.08f;
+
+	if (sweep > 0.6f) {
+		sweep = 0.6f;
+	}
+
+	float totalSweep = idMath::Sin(gameLocal.time * 0.02f) * sweep;
+	firingDirection += playerViewAxis[1] * totalSweep;
+	firingDirection.Normalize();
+
+	// Changed the trace code under to use firingdirection 
+
 	// Cast a ray out to the lock range
 // RAVEN BEGIN
 // ddynerman: multiple clip worlds
 // jshepard: allow projectile hits
+
 	gameLocal.TracePoint(	owner, tr, 
 							playerViewOrigin, 
-							playerViewOrigin + playerViewAxis[0] * range, 
+							playerViewOrigin + firingDirection * range, 
 							(MASK_SHOT_RENDERMODEL|CONTENTS_WATER|CONTENTS_PROJECTILE), owner );
+
 // RAVEN END
 	// Calculate the direction of the lightning effect using the barrel joint of the weapon
 	// and the end point of the trace
@@ -522,9 +552,14 @@ void rvWeaponLightningGun::UpdateEffects( const idVec3& origin ) {
 	}
 	
 	// Chain lightning effects
+
+	// changed to make the lightning chain visual appear from above
 	parent = &currentPath;
 	for ( i = 0; i < chainLightning.Num(); i ++ ) {
-		chainLightning[i].UpdateEffects( parent->origin, weaponDef->dict );
+		idVec3 lightningStrike = chainLightning[i].origin;
+		lightningStrike.z += 500.0f;
+
+		chainLightning[i].UpdateEffects( lightningStrike, weaponDef->dict );
 		parent = &chainLightning[i];
 	}
 }

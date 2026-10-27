@@ -62,7 +62,7 @@ entityDef weapon_lightninggun
 	"model"						"models/weapons/lightning_gun/w_lg.lwo"
 	"def_dropItem"				"weapon_lightninggun"
 
-	"chainLightningRange"		"0 0"
+	"chainLightningRange"		"400 500"
 
 	"fireRate"					".05"
 	"spread"					"1"

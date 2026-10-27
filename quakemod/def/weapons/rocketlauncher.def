@@ -56,6 +56,7 @@ entityDef weapon_rocketlauncher
 
 	"spawnclass"				"idItem"
 	"weaponclass"				"rvWeaponRocketLauncher"
+
 	"size"						"32 32 32"
   	"model_view"				"weapon_rocketlauncher_view"
   	"model_view_strogg"			"weapon_rocketlauncher_view_strogg"
@@ -75,8 +76,8 @@ entityDef weapon_rocketlauncher
 	"inv_icon"					"gfx/guis/hud/icons/item_rocket.tga"
 	"inv_name"					"#str_107409"	
 
-	"fireRate"					".35"
-	"reloadRate"				".6"
+	"fireRate"					".45"
+	"reloadRate"				"1.25"
 	"spread"					"25"
 
 	"ammoRegenStep"				"1"
@@ -85,7 +86,7 @@ entityDef weapon_rocketlauncher
 	"weaponname"				"Rocket Launcher"
 	"def_projectile"			"projectile_rocket"
 	"ammoType"					"ammo_rocketlauncher"
-	"clipSize"					"0"
+	"clipSize"					"1"
 	"ammoRequired"				"1"
 	"gui"						"guis/weapons/rocketlauncher_ammo.gui"
 	"mtr_icon"					"gfx/guis/hud/icons/gun_rocketlauncher"
@@ -330,19 +331,25 @@ entityDef projectile_rocket
 	"def_damage"				"damage_rocketDirect"
 	"def_splash_damage"			"damage_rocketSplash"
 																											
-	"speed"						"350"
+	"speed"						"950"
 	"fuse"						"8"
 	"push"						"48000"
-	"gravity"					"1.2"
+	//"gravity"					"1.2"
 
-	"bounce"					"1"
-	"bounce_count"				"3"
+	//"bounce"					"1"
+	//"bounce_count"			"3"
 							
 	"detonate_on_fuse"			"1"
 	"detonate_on_death"			"0"
 	"detonate_on_world"			"0"
 	"detonate_on_actor"			"1"
-	"detonate_on_bounce"		"0"
+	//"detonate_on_bounce"		"0"
+
+	"def_impactEntity"			"projectile_rocket_dmg"
+	"numImpactEntities"			"1"
+	"ieMinPitch"				"5"
+	"ieMaxPitch"				"10"
+	"ieSlicePercentage"			"0.25"
 								
 	"impact_gib"				"1"								
 	"decal_size"				"75"
@@ -350,9 +357,11 @@ entityDef projectile_rocket
 	"fx_fly"				"effects/weapons/rocketlauncher/fly.fx"
 	"fx_fly_mp"				"effects/weapons/rocketlauncher/fly_mp.fx"
 	"fx_fly_mp_low"			"effects/weapons/rocketlauncher/fly_mp_low.fx"
-	"fx_detonate"				"effects/weapons/rocketlauncher/detonate.fx"
+	//"fx_detonate"				"effects/weapons/rocketlauncher/detonate.fx"
+	"fx_detonate"				"effects/weapons/dmg/impact_default.fx"
 	"fx_detonate_mp"			"effects/weapons/rocketlauncher/detonate_mp.fx"
-	"fx_impact"				"effects/weapons/rocketlauncher/impact.fx"
+	//"fx_impact"				"effects/weapons/rocketlauncher/impact.fx"
+	"fx_impact"				"effects/weapons/dmg/impact_default_mp.fx"
 	"fx_impact_mp"				"effects/weapons/rocketlauncher/impact_mp.fx"
 	"fx_impact_water"			"effects/ambient/splash_med.fx"
 	"fx_impact_rock"			"effects/weapons/rocketlauncher/impact_concrete.fx"
@@ -386,6 +395,24 @@ entityDef projectile_rocket_homing
 		
 	"turn_max"					"360"
 	"clamp_dist"				"10000"
+
+	"def_impactEntity"			""
+	"numImpactEntities"			"0"
+	"ieMinPitch"				"20"
+	"ieMaxPitch"				"30"
+	"ieSlicePercentage"			"1"
+}
+
+entityDef projectile_rocket_dmg
+{
+	"inherit"					"projectile_dmg"
+	"damage"					"2"
+	"speed"						"100"
+
+	"detonate_on_world"			"0"
+	"detonate_on_actor"			"1"
+	"bounce"					"0"
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -420,7 +447,7 @@ entityDef damage_rocketSplash
 	"radius"					"180"
 	"knockback"					"100"
 	"push"						"10000"
-	"gib"						"0"
+	//"gib"						"0"
 
 	"deathPush"					"100"
 	"deathPushMin"				"5000 6000"
